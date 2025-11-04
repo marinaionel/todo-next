@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import TodoItem from "./TodoItem";
+import ClientTodoItem from "./ClientTodoItem";
 import { Todo } from "../models/todo";
 
 export default function ClientTodos() {
@@ -9,8 +9,17 @@ export default function ClientTodos() {
 
   const refreshTodos = async () => {
     const res = await fetch("/api/todos");
+    if (!res.ok) return;
     const newTodos: Todo[] = await res.json();
     setTodos(newTodos);
+  };
+
+  const toggleTodo = (id: string) => {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   };
 
   return (
@@ -22,7 +31,7 @@ export default function ClientTodos() {
       ) : (
         <ul className="space-y-2">
           {todos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} />
+            <ClientTodoItem key={todo.id} todo={todo} onToggle={toggleTodo} />
           ))}
         </ul>
       )}
